@@ -394,7 +394,7 @@ Yes, hashtags can contain unicode characters. You should clean hashtags in featu
 * *Do I need to account for empty tweets?*  
 No, for simplicity you may assume that all the tweets contain at least one word.  However, many tweets contain only unicode chracters, which will be effectively empty after you clean them.  This means you will have to test properly when implementing the second feature on real data.   
 
-* *Do I need to account for JSON messages that looks like {"limit":{"track":5,"timestamp_ms":"1446218985743"}}, which appear in the example from the data generator?*  
+* *Do I need to account for JSON messages that looks like {"limit": {"track":5,"timestamp_ms":"1446218985743"} }, which appear in the example from the data generator?*  
 No, these are simply artifacts from the Twitter API that result from the rate-limit.  Our testing suite will not contain these messages, and they can be ignored.   
 
 * *Should my graph from feature 2 contain disconnected nodes?*                                       
