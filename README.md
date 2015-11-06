@@ -403,6 +403,12 @@ No, the graph should only contain connected nodes, and this also means that you 
 * *Should I check if the files in the input directory are text files or non-text files(binary)?*  
 No, for simplicity you may assume that all of the files in the input directory are standard text files.  
 
+* *What should the average be if the graph has no connections (e.g. if the first tweet doesn't have at least two hashtags)?*  
+If there are no connections for the entire graph, then you can count the average as 0.  
+
+* *Should I count self connections if a hashtag appears multiple times in a tweet?*  
+No, for simplicity you should not count connection from a node to itself.  
+
 * *Do I need separate programs for different features?*  
 You may use a single combined program or several programs, as long as they are all executed by the `run.sh` script.
 
