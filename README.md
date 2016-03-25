@@ -36,7 +36,7 @@ You will continually update the Twitter hashtag graph and hence, the average deg
 * "created_at" - timestamp of the tweet
 
 ### Building the Twitter Hashtag Graph
-Example of 4 tweets (using the same format from the first feature)
+Example of 4 tweets
 
 ```
 Spark Summit East this week! #Spark #Apache (timestamp: Thu Oct 29 
@@ -228,10 +228,10 @@ The rolling average degree since the 4th tweet is now
 1.67
 ```
 
-The output of the second feature should be a file in the `tweet_output` directory named `output.txt` that contains the rolling average for each tweet in the file (e.g. if there are three input tweets, then there should be 3 averages), following the format above.  The precision of the average should be two digits after the decimal place (i.e. rounded to the nearest hundredths place).
+The output should be a file in the `tweet_output` directory named `output.txt` that contains the rolling average for each tweet in the file (e.g. if there are three input tweets, then there should be 3 averages), following the format above.  The precision of the average should be two digits after the decimal place (i.e. rounded to the nearest hundredths place).
 
 ## Collecting tweets from the Twitter API
-Ideally, the updates of the average degree of a Twitter hashtag graph as each tweet arrives would be connected to the Twitter streaming API and would add new tweets to the end of `tweets.txt`.  However, connecting to the API requires more system specific "dev ops" work, which isn't the primary focus for data engineers.  Instead, you should simply assume that each new line of the text file corresponds to a new tweet and design your program to handle a text file with a large number of tweets.  Your program should output the results of this second feature to a text file named `output.txt` in the `tweet_output` directory.
+Ideally, the updates of the average degree of a Twitter hashtag graph as each tweet arrives would be connected to the Twitter streaming API and would add new tweets to the end of `tweets.txt`.  However, connecting to the API requires more system specific "dev ops" work, which isn't the primary focus for data engineers.  Instead, you should simply assume that each new line of the text file corresponds to a new tweet and design your program to handle a text file with a large number of tweets.  Your program should output the results to a text file named `output.txt` in the `tweet_output` directory.
 
 
 ## Writing clean, scalable, and well-tested code  
@@ -333,14 +333,14 @@ You should replace the escape characters as follows:
 * *Can tweets in the tweets.txt file be out of order?*           						    
 No, for simplicity you can assume that the incoming tweets are in order. Although tweets from Twitter API may be out of order sometimes, the testing suite will test your code with all the tweets in order.
 
-* *Will the JSON input for the second feature contain the hashtag entity, or do I have to extract it from the text?*                                       
+* *Will the JSON input contain the hashtag entity, or do I have to extract it from the text?*                                       
 You may use the hashtags directly from the entity field of the JSON, or you may extract it from the text.  In either case, you will need to make the hashtags have been "cleaned" as described in feature 1.  
 
 * *Can hashtags contain unicode characters and how should these be handled?*                                       
 Yes, hashtags can contain unicode characters. You should clean hashtags in feature 2 the same way you clean a tweet in feature 1.
 
 * *Do I need to account for empty tweets?*  
-No, for simplicity you may assume that all the tweets contain at least one word.  However, many tweets contain only unicode chracters, which will be effectively empty after you clean them.  This means you will have to test properly when implementing the second feature on real data.   
+No, for simplicity you may assume that all the tweets contain at least one word.  However, many tweets contain only unicode chracters, which will be effectively empty after you clean them.  This means you will have to test properly when implementing on real data.   
 
 * *Do I need to account for JSON messages that looks like {"limit": {"track":5,"timestamp_ms":"1446218985743"} }, which appear in the example from the data generator?*  
 No, these are simply artifacts from the Twitter API that result from the rate-limit.  Our testing suite will not contain these messages, and they can be ignored.   
