@@ -158,6 +158,7 @@ Now let's say that the next two tweets that come in have the following timestamp
 
 ```
 New 2.7.1 version update for #Hadoop #Apache (timestamp: Thu Oct 29 17:52:28 +0000 2015)
+
 Looking forward to checking out the updates on Spark GraphX #Spark #GraphX (timestamp: Thu Oct 29 17:51:27 +0000 2015)
 ```
 
@@ -171,6 +172,7 @@ So excited to learn about NoSQL databases! #Apache #NoSQL (timestamp: Thu Oct 29
 Just saw a great post on Insight Data Engineering #Apache #Hadoop #Storm (timestamp: Thu Oct 29 17:51:30 +0000 2015)
 
 Doing great work #Apache (timestamp: Thu Oct 29 17:51:55 +0000 2015)
+
 Excellent post on #Flink and #Spark (timestamp: Thu Oct 29 17:51:56 +0000 2015)
 
 New and improved #HBase connector for #Spark (timestamp: Thu Oct 29 17:51:59 +0000 2015)
@@ -361,7 +363,7 @@ No, for simplicity you should not count connection from a node to itself.
 You may use a single combined program or several programs, as long as they are all executed by the `run.sh` script.
 
 * *Can I use an IDE like Eclipse to write my program?*  
-Yes, you can use what ever tools you want -  as long as your `run.sh` script correctly runs the relevant target files and creates the `ft1.txt` and `ft2.txt` files in the `tweet_output` directory.
+Yes, you can use what ever tools you want -  as long as your `run.sh` script correctly runs the relevant target files and creates the `output.txt` file in the `tweet_output` directory.
 
 * *What should be in the `tweet_input` directory?*  
 You can put any text file you want in the directory.  In fact, this could be quite helpful for testing your solutions.
