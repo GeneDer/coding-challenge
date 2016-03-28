@@ -17,9 +17,9 @@ Here, we have to define a few concepts (though there will be examples below to c
 
 We'd like you to implement your own version of this.  However, we don't want this challenge to focus on the relatively uninteresting "dev ops" of connecting to the Twitter API, which can be complicated for some users.  Normally, tweets can be obtained through Twitter's API in JSON format, but you may assume that this has already been done and written to a file named `tweets.txt` inside a directory named `tweet_input`.  
 
-(NEED TO CHANGE)For simplicity, this file `tweets.txt` will only contain the actual JSON messages (in reality, the API also can emit messages about the connection and the API rate limits).  Additionally, `tweets.txt` will have the content of each tweet on a newline:
+For simplicity, this file `tweets.txt` will only contain the actual JSON messages (in reality, the API also can emit messages about the connection and the API rate limits).  Additionally, `tweets.txt` will have the content of each tweet on a newline:
 
-tweets.txt:
+tweets.txt: 
 
 	{JSON of first tweet}  
 	{JSON of second tweet}  
@@ -29,35 +29,50 @@ tweets.txt:
 	.
 	{JSON of last tweet}  
 
+One example of the data for a single Tweet might look like:
+
+<pre>
+{"created_at":"Fri Oct 30 15:29:45 +0000 2015","id":660116384450347008,
+"id_str":"660116384450347008","text":"We're #hiring! Click to apply: SMB Analyst - https:\/\/t.co\/lAy8j01BkE #BusinessMgmt #NettempsJobs #MenloPark, CA #Job #Jobs #CareerArc",
+"source":"\u003ca href=\"http:\/\/www.tweetmyjobs.com\" rel=\"nofollow\"\u003eTweetMyJOBS\u003c\/a\u003e","truncated":false,"in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,
+"in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":24315640,"id_str":"24315640","name":"TMJ-SJC Mgmt. Jobs","screen_name":"tmj_sjc_mgmt","location":"San Jose, CA","url":"http:\/\/tweetmyjobs.com",
+"description":"Follow this account for geo-targeted Business\/Mgmt. job tweets in San Jose, CA from TweetMyJobs. Need help? Tweet us at @TweetMyJobs!","protected":false,"verified":false,"followers_count":389,
+"friends_count":256,"listed_count":23,"favourites_count":0,"statuses_count":422,"created_at":"Sat Mar 14 02:57:56 +0000 2009","utc_offset":-14400,"time_zone":"Eastern Time (US & Canada)",
+"geo_enabled":true,"lang":"en","contributors_enabled":false,"is_translator":false,"profile_background_color":"253956",
+"profile_background_image_url":"http:\/\/pbs.twimg.com\/profile_background_images\/315515499\/Twitter-BG_2_bg-image.jpg",
+"profile_background_image_url_https":"https:\/\/pbs.twimg.com\/profile_background_images\/315515499\/Twitter-BG_2_bg-image.jpg","profile_background_tile":false,"profile_link_color":"96BEDF",
+"profile_sidebar_border_color":"000000","profile_sidebar_fill_color":"407DB0","profile_text_color":"000000",
+"profile_use_background_image":true,"profile_image_url":"http:\/\/pbs.twimg.com\/profile_images\/2303732039\/Logo_tmj_new2b_normal.png",
+"profile_image_url_https":"https:\/\/pbs.twimg.com\/profile_images\/2303732039\/Logo_tmj_new2b_normal.png","profile_banner_url":"https:\/\/pbs.twimg.com\/profile_banners\/24315640\/1349361844",
+"default_profile":false,"default_profile_image":false,"following":null,"follow_request_sent":null,"notifications":null},"geo":{"type":"Point","coordinates":[37.4484914,-122.1802812]},"coordinates":{"type":"Point","coordinates":[-122.1802812,37.4484914]},"place":{"id":"490bdb082950484f",
+"url":"https:\/\/api.twitter.com\/1.1\/geo\/id\/490bdb082950484f.json","place_type":"city","name":"Menlo Park","full_name":"Menlo Park, CA",
+"country_code":"US","country":"United States","bounding_box":{"type":"Polygon","coordinates":[[[-122.228635,37.416515],[-122.228635,37.507328],[-122.120415,37.507328],[-122.120415,37.416515]]]},
+"attributes":{}},"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"entities":{<b>"hashtags":[{"text":"hiring","indices":[6,13]},{"text":"BusinessMgmt","indices":[69,82]},{"text":"NettempsJobs","indices":[83,96]},{"text":"MenloPark","indices":[97,107]},
+{"text":"Job","indices":[112,116]},{"text":"Jobs","indices":[117,122]},{"text":"CareerArc","indices":[123,133]}]</b>,"urls":[{"url":"https:\/\/t.co\/lAy8j01BkE",
+"expanded_url":"http:\/\/bit.ly\/1XEF1ja","display_url":"bit.ly\/1XEF1ja","indices":[45,68]}],"user_mentions":[],"symbols":[]},"favorited":false,"retweeted":false,"possibly_sensitive":false,"filter_level":"low","lang":"en",<b>"timestamp_ms":"1446218985079"</b>}
+
+</pre>
+
+Although this contains a lot of information, you will only need the hashtags and timestamp of each entry, which are in bold in the above entry.
+
 ## Implementation Details
 
 You will continually update the Twitter hashtag graph and hence, the average degree of the graph. The graph should just be built using tweets that arrived in the last 60 seconds as compared to the timestamp of the latest tweet. As new tweets come in, edges formed with tweets older than 60 seconds from the timstamp of the latest tweet should be evicted. For each incoming tweet, only extract the following fields in the JSON response
+
 * "hashtags" - hashtags found in the tweet
-* "created_at" - timestamp of the tweet
+* "timestamp_ms" - timestamp of the tweet
+
+Although the hastags also appear in "text" field, no need to go through the effort of extracting the hashtags from that field since there already is a "hashtag" field.  Also, although there is "created\_at" field, please use the "timestamp_ms" field. 
 
 ### Building the Twitter Hashtag Graph
-Example of 4 tweets
+Example of extracted info from 4 tweets
 
 ```
-Spark Summit East this week! #Spark #Apache (timestamp: Thu Oct 29 
-17:51:27 +0000 2015)
-
-So excited to learn about NoSQL databases! #Apache #NoSQL (timestamp: Thu Oct 29 17:51:22 +0000 2015)
-
-Just saw a great post on Insight Data Engineering #Apache #Hadoop #Storm (timestamp: Thu Oct 29 17:51:30 +0000 2015)
-
-Doing great work #Apache (timestamp: Thu Oct 29 17:51:55 +0000 2015)
-Excellent post on #Flink and #Spark (timestamp: Thu Oct 29 17:51:56 +0000 2015)
-```
-
-Extracted hashtags from each tweet
-
-```
-#Spark , #Apache (timestamp: Thu Oct 29 17:51:27 +0000 2015)
-#Apache , #NoSQL (timestamp: Thu Oct 29 17:51:22 +0000 2015)
-#Apache, #Hadoop, #Storm (timestamp: Thu Oct 29 17:51:30 +0000 2015)
-#Apache (timestamp: Thu Oct 29 17:51:55 +0000 2015)
-#Flink, #Spark (timestamp: Thu Oct 29 17:51:56 +0000 2015)
+hashtags = [Spark , Apache], timestamp_ms: 1446218980000
+hashtags = [Apache , NoSQL],  timestamp_ms: 1446218980000
+hashtags = [Apache, Hadoop, Storm], timestamp_ms: 1446218980000
+hashtags = [Apache], timestamp_ms: 1446218980000
+hashtags = [Flink, Spark], timestamp_ms: 1446218980000
 ```
 
 Note that the the order of the tweets coming in **are not ordered by time**, which mimics what one would get from Twitter's streaming API.  Two hashtags will be connected if and only if they are present in the same tweet. Only tweets that contain two or more **DISTINCT** hashtags can create new edges.
@@ -108,16 +123,10 @@ The rolling average degree since the 4th tweet is now
 ```
 
 ### Modifying the Twitter Hashtag Graph with Incoming Tweet
-Now let's say another tweet has arrived
+Now let's say another tweet has arrived, with hashtags and timestamp
 
 ```
-New and improved #HBase connector for #Spark (timestamp: Thu Oct 29 17:51:59 +0000 2015)
-```
-
-The extracted hashtags are then
-
-```
-#HBase, #Spark (timestamp: Thu Oct 29 17:51:59 +0000 2015)
+hashtags = [HBase, Spark], timestamp_ms: 1446218980000
 ```
 
 and added to the edge list
@@ -157,29 +166,22 @@ The rolling average degree since the 4th tweet is now
 Now let's say that the next two tweets that come in have the following timestamps
 
 ```
-New 2.7.1 version update for #Hadoop #Apache (timestamp: Thu Oct 29 17:52:28 +0000 2015)
+hashtags = [Hadoop, Apache] timestamp_ms: 1446218980000
 
-Looking forward to checking out the updates on Spark GraphX #Spark #GraphX (timestamp: Thu Oct 29 17:51:27 +0000 2015)
+hashtags = [Spark, GraphX] timestamp_ms: 1446218980000
 ```
 
 The full list of tweets now is 
 
 ```
-Spark Summit East this week! #Spark #Apache (timestamp: Thu Oct 29 17:51:27 +0000 2015)
-
-So excited to learn about NoSQL databases! #Apache #NoSQL (timestamp: Thu Oct 29 17:51:22 +0000 2015)
-
-Just saw a great post on Insight Data Engineering #Apache #Hadoop #Storm (timestamp: Thu Oct 29 17:51:30 +0000 2015)
-
-Doing great work #Apache (timestamp: Thu Oct 29 17:51:55 +0000 2015)
-
-Excellent post on #Flink and #Spark (timestamp: Thu Oct 29 17:51:56 +0000 2015)
-
-New and improved #HBase connector for #Spark (timestamp: Thu Oct 29 17:51:59 +0000 2015)
-
-New 2.7.1 version update for #Hadoop #Apache (timestamp: Thu Oct 29 17:52:28 +0000 2015)
-
-Looking forward to checking out the updates on Spark GraphX #Spark #GraphX (timestamp: Thu Oct 29 17:51:27 +0000 2015)
+hashtags = [Spark , Apache], timestamp_ms: 1446218980000
+hashtags = [Apache , NoSQL],  timestamp_ms: 1446218980000
+hashtags = [Apache, Hadoop, Storm], timestamp_ms: 1446218980000
+hashtags = [Apache], timestamp_ms: 1446218980000
+hashtags = [Flink, Spark], timestamp_ms: 1446218980000
+hashtags = [HBase, Spark], timestamp_ms: 1446218980000
+hashtags = [Hadoop, Apache] timestamp_ms: 1446218980000
+hashtags = [Spark, GraphX] timestamp_ms: 1446218980000
 ```
 
 We can see that the second tweet has a timestamp that is more than 60 seconds behind this new tweet. This means that we do not want to include our first tweet in our average degree calculation.  Although `#Spark` and `#GraphX` never appeared prior to the last tweet, we do not form an edge `#Spark <-> #GraphX` since the time-stamp is not in the 2nd time window.
@@ -187,11 +189,11 @@ We can see that the second tweet has a timestamp that is more than 60 seconds be
 The new hashtags to be used are as follows
 
 ```
-#Apache, #Hadoop, #Storm (timestamp: Thu Oct 29 17:51:30 +0000 2015)
-#Apache (timestamp: Thu Oct 29 17:51:55 +0000 2015)
-#Flink, #Spark (timestamp: Thu Oct 29 17:51:56 +0000 2015)
-#HBase, #Spark (timestamp: Thu Oct 29 17:51:59 +0000 2015)
-#Hadoop #Apache (timestamp: Thu Oct 29 17:52:28 +0000 2015)
+hashtags = [Apache, Hadoop, Storm], timestamp_ms: 1446218980000
+hashtags = [Apache], timestamp_ms: 1446218980000
+hashtags = [Flink, Spark], timestamp_ms: 1446218980000
+hashtags = [HBase, Spark], timestamp_ms: 1446218980000
+hashtags = [Hadoop, Apache] timestamp_ms: 1446218980000
 ```
 
 The new edge list only has the `#Spark` <-> `#Apache` edge removed since `#Hadoop` <-> `#Apache` from the new tweet already exists in the edge list.
@@ -339,7 +341,7 @@ No, for simplicity you can assume that the incoming tweets are in order. Althoug
 You may use the hashtags directly from the entity field of the JSON, or you may extract it from the text.  In either case, you will need to make the hashtags have been "cleaned" as described in feature 1.  
 
 * *Can hashtags contain unicode characters and how should these be handled?*                                       
-Yes, hashtags can contain unicode characters. You should clean hashtags in feature 2 the same way you clean a tweet in feature 1.
+Yes, hashtags can contain unicode characters. You should clean hashtags in feature 2 the same way you clean a tweet in feature 1. (WHAT ABOUT THIS?) -- MENTION TO SIMPLY USE THE HASHTAG ENTITY IN THE JSON FORMAT OF TWEETS
 
 * *Do I need to account for empty tweets?*  
 No, for simplicity you may assume that all the tweets contain at least one word.  However, many tweets contain only unicode chracters, which will be effectively empty after you clean them.  This means you will have to test properly when implementing on real data.   
@@ -347,7 +349,7 @@ No, for simplicity you may assume that all the tweets contain at least one word.
 * *Do I need to account for JSON messages that looks like {"limit": {"track":5,"timestamp_ms":"1446218985743"} }, which appear in the example from the data generator?*  
 No, these are simply artifacts from the Twitter API that result from the rate-limit.  Our testing suite will not contain these messages, and they can be ignored.   
 
-* *Should my graph from feature 2 contain disconnected nodes?*                                       
+* *Should my graph contain disconnected nodes?*                                       
 No, the graph should only contain connected nodes, and this also means that you may need to remove nodes if they are no longer connected in the last 60 seconds.  
 
 * *Should I check if the files in the input directory are text files or non-text files(binary)?*  
@@ -358,9 +360,6 @@ If there are no connections for the entire graph, then you can count the average
 
 * *Should I count self connections if a hashtag appears multiple times in a tweet?*  
 No, for simplicity you should not count connection from a node to itself.  
-
-* *Do I need separate programs for different features?*  
-You may use a single combined program or several programs, as long as they are all executed by the `run.sh` script.
 
 * *Can I use an IDE like Eclipse to write my program?*  
 Yes, you can use what ever tools you want -  as long as your `run.sh` script correctly runs the relevant target files and creates the `output.txt` file in the `tweet_output` directory.
