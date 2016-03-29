@@ -32,7 +32,7 @@ This file `tweets.txt` will contain the actual JSON messages (and the messages e
 One example of the data for a single Tweet might look like:
 
 <pre>
-{"created_at":"Fri Oct 30 15:29:45 +0000 2015","id":660116384450347008,
+{<b>"created_at":"Fri Oct 30 15:29:45 +0000 2015"</b>,"id":660116384450347008,
 "id_str":"660116384450347008","text":"We're #hiring! Click to apply: SMB Analyst - https:\/\/t.co\/lAy8j01BkE #BusinessMgmt #NettempsJobs #MenloPark, CA #Job #Jobs #CareerArc",
 "source":"\u003ca href=\"http:\/\/www.tweetmyjobs.com\" rel=\"nofollow\"\u003eTweetMyJOBS\u003c\/a\u003e","truncated":false,"in_reply_to_status_id":null,"in_reply_to_status_id_str":null,"in_reply_to_user_id":null,
 "in_reply_to_user_id_str":null,"in_reply_to_screen_name":null,"user":{"id":24315640,"id_str":"24315640","name":"TMJ-SJC Mgmt. Jobs","screen_name":"tmj_sjc_mgmt","location":"San Jose, CA","url":"http:\/\/tweetmyjobs.com",
@@ -51,20 +51,20 @@ One example of the data for a single Tweet might look like:
 "entities":{<b>"hashtags":[{"text":"hiring","indices":[6,13]},{"text":"BusinessMgmt","indices":[69,82]},{"text":"NettempsJobs","indices":[83,96]},{"text":"MenloPark","indices":[97,107]},
 {"text":"Job","indices":[112,116]},{"text":"Jobs","indices":[117,122]},{"text":"CareerArc","indices":[123,133]}]</b>,"urls":[{"url":"https:\/\/t.co\/lAy8j01BkE",
 "expanded_url":"http:\/\/bit.ly\/1XEF1ja","display_url":"bit.ly\/1XEF1ja","indices":[45,68]}],"user_mentions":[],"symbols":[]},"favorited":false,"retweeted":false,"possibly_sensitive":false,"filter_level":"low","lang":"en",
-<b>"timestamp_ms":"1446218985079"</b>}
+"timestamp_ms":"1446218985079"}
 
 </pre>
 
-Although this contains a lot of information, you will only need the **hashtags** and **timestamp_ms** fields of each entry, which are in bold in the above entry.
+Although this contains a lot of information, you will only need the **hashtags** and **created_at** fields of each entry, which are in bold in the above entry.
 
 You will update the Twitter hashtag graph each time you process a new tweet and hence, the average degree of the graph. The graph should only consist of tweets that arrived in the last 60 seconds as compared to the maximum timestamp that has been processed. 
 
 As new tweets come in, edges formed with tweets older than 60 seconds from the maximum timestamp being processed should be evicted. For each incoming tweet, only extract the following fields from the JSON response
 
 * **"hashtags"** - hashtags found in the tweet
-* **"timestamp_ms"** - timestamp of the tweet
+* **"created_at"** - timestamp of the tweet
 
-Although the hastags also appear in the "text" field, there is no need to go through the effort of extracting the hashtags from that field since there already is a "hashtags" field.  Also, although there is "created\_at" field, please use the "timestamp_ms" field.
+Although the hastags also appear in the "text" field, there is no need to go through the effort of extracting the hashtags from that field since there already is a "hashtags" field.
 
 ## Building the Twitter Hashtag Graph
 
