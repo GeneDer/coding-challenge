@@ -66,7 +66,8 @@ As new tweets come in, edges formed with tweets older than 60 seconds from the m
 
 Although the hastags also appear in the "text" field, there is no need to go through the effort of extracting the hashtags from that field since there already is a "hashtags" field.  Also, although there is "created\_at" field, please use the "timestamp_ms" field.
 
-### Building the Twitter Hashtag Graph
+## Building the Twitter Hashtag Graph
+
 Here is an example of the extracted information from 4 tweets:
 
 ```
@@ -169,6 +170,7 @@ The rolling average degree output at the end of fourth tweet is
 Note that all the tweets are in order of time in this example and for every incoming tweet, all the old tweets are in the 60 second window of the timestamp of the latest incoming tweet and hence, no tweets are evicted (we'll see an example below on how the edge eviction should be handled with time).
 
 ## Modifying the Twitter Hashtag Graph with Incoming Tweet
+
 Now let's say another tweet has arrived and the extracted information is
 
 ```
