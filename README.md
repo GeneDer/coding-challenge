@@ -437,7 +437,7 @@ Alternatively, here is example output of the `tree` command:
 	            └── tweet_output
 	                └── output.txt
 
-The contents of `src` do not have to contain a single file called "average_degree.py", you are free to include one or more files and name them as you wish.  
+The contents of `src` do not have to contain a single file called "average_degree.java", you are free to include one or more files and name them as you wish.  
 
 ## Testing your directory structure and output format
 To make sure that your code has the correct directory strucure and the format of the output data in output.txt is correct, we included a test script, called `run_tests.sh` in the insight_testsuite folder.
