@@ -274,7 +274,7 @@ We'll then calculate the new degree for all the nodes in both graphs.
 Recalculating the average degree of all nodes in all graphs is as follows
 
 ```
-Average Degree = (1+2+1+2+2+2)/6 = 1.67
+Average Degree = (1+2+1+2+2+2)/6 = 1.66
 ```
 
 Normally the average degree is calculated for a single graph, but maintaining multiple graphs for this problem can be quite difficult. For simplicity, we are only interested in calculating the average degree of of all the nodes in all graphs despite them being disconnected.
@@ -287,20 +287,22 @@ The rolling average degree now becomes
 2.00
 2.00
 2.00
-1.67
+1.66
 ```
 
 ## Dealing with tweets which arrive out of order in time
 [Back to Table of Contents](README.md#table-of-contents)
 
-Tweets which are out of order and fall within 60 sec window of the maximum timestamp processed or in other words, are less than 60 sec older than the maximum timestamp being processed, will create new edges in the graph. However, tweets which are out of order in time and are outside the 60 sec window of the maximum timestamp processed (or more than 60 sec older than the maximum timestamp being processed) should be ignored and such tweets won't contribute to building the graph. Its easiest to understand this with an example.
+Tweets which are out of order and fall within the 60 sec window of the maximum timestamp processed or in other words, are less than 60 sec older than the maximum timestamp being processed, will create new edges in the graph. However, tweets which are out of order in time and are outside the 60-second window of the maximum timestamp processed (or more than 60 seconds older than the maximum timestamp being processed) should be ignored and such tweets won't contribute to building the graph.  Below is a diagram showing this, with the Nth tweet corresponding to the tweet on the the Nth line of the `tweets.txt` file.
 
-Let's say that a new tweet comes in and the extracted information is
+![tweet-out-of-order](images/sliding-window.png)
+
+It's easiest to understand this with an example.  Let's say that a new tweet comes in and the extracted information is
 
 ```
 hashtags = [Flink, HBase], created_at: Thu Mar 24 17:52:10 +0000 2016
 ```
-This tweet is out of order in time but falls within the 60 second time window of the maximum timestamp processed (latest timestamp), i.e., *Thu Mar 24 17:52:12 +0000 2016*.
+This tweet is out of order in time but falls within the 60 second time window of the maximum timestamp processed (latest timestamp), i.e., `Thu Mar 24 17:52:12 +0000 2016`.
 
 The new hashtags to be used in constructing the graph are as follows
 
@@ -342,7 +344,7 @@ The rolling average degree output becomes
 2.00
 2.00
 2.00
-1.67
+1.66
 2.00
 ```
 
@@ -351,7 +353,7 @@ Now, let's say that a new tweet comes in and the extracted information is
 ```
 hashtags = [Cassandra, NoSQL], created_at: Thu Mar 24 17:51:10 +0000 2016
 ```
-This tweet is out of order and is outside the 60 second window of the maximum timestamp processed (latest timestamp),  i.e., Thu Mar 24 17:52:12 +0000 2016. This tweet should be ignored. It will not form new edges and will not contribute to the graph formation. The graph remains the same as before this tweet arrived.
+This tweet is out of order and is outside the 60 second window of the maximum timestamp processed (latest timestamp),  i.e., `Thu Mar 24 17:52:12 +0000 2016`. This tweet should be ignored. It will not form new edges and will not contribute to the graph formation. The graph remains the same as before this tweet arrived.
 
 Consider that a new tweet arrives and the extracted information is
 
@@ -390,7 +392,7 @@ The graph is as follows
 ![new-tweet-in-order](images/htag_graph_7.png)
 
 ```
-The average degree of the graph is (2+2+2+2+1+1) / 6 = 1.67
+The average degree of the graph is (2+2+2+2+1+1) / 6 = 1.66
 ```
 The rolling average degree output is
 
@@ -400,12 +402,12 @@ The rolling average degree output is
 2.00
 2.00
 2.00
-1.67
+1.66
 2.00
-1.67
+1.66
 ```
 
-The output should be a file in the `tweet_output` directory named `output.txt` that contains the rolling average for each tweet in the file **(e.g. if there are three input tweets, then there should be 3 averages)**, following the format above. The precision of the average should be two digits after the decimal place (i.e. rounded to the nearest hundredths place).
+The output should be a file in the `tweet_output` directory named `output.txt` that contains the rolling average for each tweet in the file **(e.g. if there are three input tweets, then there should be 3 averages)**, following the format above. The precision of the average should be two digits after the decimal place with truncation.
 
 
 ## Collecting tweets from the Twitter API
@@ -455,7 +457,7 @@ The contents of `src` do not have to contain a single file called "average_degre
 ## Testing your directory structure and output format
 [Back to Table of Contents](README.md#table-of-contents)
 
-To make sure that your code has the correct directory strucure and the format of the output data in output.txt is correct, we included a test script, called `run_tests.sh` in the insight_testsuite folder.
+To make sure that your code has the correct directory structure and the format of the output data in output.txt is correct, we included a test script, called `run_tests.sh` in the insight_testsuite folder.
 
 The tests are stored simply as text files under the `insight_testsuite/tests` folder. Each test should have a separate folder and within should have a `tweet_input` folder for `tweets.txt` and a `tweet_output` folder for `output.txt` corresponding to the current test.
 
@@ -464,7 +466,7 @@ You can run the test with the following from the insight_testsuite folder:
 insight_testsuite$ ./run_tests.sh 
 ```
 
-The output of `run_tests.sh` sould look like:
+The output of `run_tests.sh` should look like:
 ```bash
 [FAIL]: test-2-tweets-all-distinct
 [Tue Mar 29 2016 11:59:59] 0 of 1 tests passed
@@ -492,7 +494,7 @@ You should submit the URL for the top-level root of your repository.  For exampl
 No, you may use a public repo, there is no need to purchase a private repo.  You may also submit a link to a Bitbucket repo if you prefer.
 
 * *Do you have any larger sample inputs?*  
-Yes, there is an example input with roughly 10,000 tweets in the `data-gen` directory of this repo.  This example includes the rate limiting messages (e.g. {"limit": {"track":5,"timestamp_ms":"1446218985743"} } ), which need to be properly removed.  It also contains a simplified producer that can connect to the live Twitter API and save the tweets to an input file that conforms to the requirements of this data challenge.  This is not required for the challenge, but may be helpful for testing your solution.  
+Yes, there is an example input with roughly 10,000 tweets in the `data-gen` directory of this repo.  This example includes the rate limiting messages (e.g. `{"limit": {"track":5,"timestamp_ms":"1446218985743"} }` ), which need to be properly removed.  It also contains a simplified producer that can connect to the live Twitter API and save the tweets to an input file that conforms to the requirements of this data challenge.  This is not required for the challenge, but may be helpful for testing your solution.  
 
 * *May I use R or other analytics programming languages to solve the challenge?*  
 While you may use any programming language to complete the challenge, it's important that your implementation scales to handle large amounts of data.  Many applicants have found that R is unable to process data in a scalable fashion, so it may be more practical to use another language.  
@@ -536,6 +538,9 @@ You should use the hashtags directly from the entity field of the JSON.  Please 
 * *Do I need to account for empty tweets?*  
 No, for simplicity you may assume that all the tweets contain at least one word.  However, many tweets won't necessarily contain two hashtags, and may not form new edges in the graph.  This means you will have to test properly when implementing your solution for real data.   
 
+* *Do I need to update the average when the next tweet in the file falls outside the 60-second window?*  
+Yes, you're average should be updated each time a new tweet is processed, regardless of if it falls outside the window.  Thus, if there are 500 tweets in the `tweets.txt`, then there should be 500 averages in `output.txt`.  The only input that should be ignored are the rate-limit messages discussed above. 
+
 * *Do I need to account for JSON messages that looks like `{"limit": {"track":5,"timestamp_ms":"1446218985743"} }`, which appear in the example from the data generator?*  
 These are messages from the Twitter API that result from the rate-limit.  Your solution needs to properly remove these messages from the input.
 
@@ -546,7 +551,7 @@ No, the graph should only contain connected nodes, and this also means that you 
 No, for simplicity you may assume that all of the files in the input directory are standard text files, with the same format as the example file in the `data-gen` directory.
 
 * *What should the average be if the graph has no connections (e.g. if the first tweet doesn't have at least two hashtags)?*  
-If there are no connections for the entire graph, then you can count the average as 0.  
+If there are no connections for the entire graph, then you can count the average as `0.00`.  
 
 * *Should I count self connections if a hashtag appears multiple times in a tweet?*  
 No, for simplicity you should not count connection from a node to itself.  More so, the hashtag entities should properly de-duplicate these hashtags for you.
@@ -558,7 +563,7 @@ Yes, you can use what ever tools you want -  as long as your `run.sh` script cor
 You can put any text file you want in the directory.  In fact, this could be quite helpful for testing your solutions.
 
 * *How will the coding challenge be evaluated?*  
-Generally, we will evaluate your coding challenge with a testing suite that provides a variety of input tweets and checks the corresponding output.  This suite will attempt to use your 'run.sh' and is fairly tolerant to different runtime environments.  Of course, there are many aspects (e.g. clean code, documentation) that cannot be tested by our suite, so each submission will also be reviewed manually by a person. 
+Generally, we will evaluate your coding challenge with a testing suite that provides a variety of input tweets and checks the corresponding output.  This suite will attempt to use your `run.sh` and is fairly tolerant to different runtime environments.  Of course, there are many aspects (e.g. clean code, documentation) that cannot be tested by our suite, so each submission will also be reviewed manually by a person. 
 
 * *How long will it take for me to hear back from you about my submission?*  
 We receive hundreds of submissions and try to evaluate them all in a timely manner.  We try to get back to all applicants within two or three weeks of submission, but if you have a specific deadline that requires expedited review, you may email us at cc@insightdataengineering.com.  
