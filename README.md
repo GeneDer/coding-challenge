@@ -7,7 +7,7 @@ For this coding challenge, you will develop tools that could help analyze the co
 
 This challenge requires you to:
 
-Calculate the average degree of a vertex in a Twitter hashtag graph for the last 60 seconds, and update this each time a new tweet appears.  You will thus be doing a calcuation of the average degree over 60 second sliding windows.
+Calculate the average degree of a vertex in a Twitter hashtag graph for the last 60 seconds, and update this each time a new tweet appears.  You will thus be doing a calcuation of the average degree over a 60-second sliding window.
 
 Here, we have to define a few concepts (though there will be examples below to clarify):
 
@@ -17,7 +17,7 @@ Here, we have to define a few concepts (though there will be examples below to c
 
 We'd like you to implement your own version of this.  However, we don't want this challenge to focus on the relatively uninteresting "dev ops" of connecting to the Twitter API, which can be complicated for some users.  Normally, tweets can be obtained through Twitter's API in JSON format, but you may assume that this has already been done and written to a file named `tweets.txt` inside a directory named `tweet_input`.  
 
-For simplicity, this file `tweets.txt` will only contain the actual JSON messages (in reality, the API also can emit messages about the connection and the API rate limits).  Additionally, `tweets.txt` will have the content of each tweet on a newline:
+This file `tweets.txt` will contain the actual JSON messages (and the API also can emit messages about the connection and rate limits, which need to be properly removed from calculations).  `tweets.txt` will have the content of each tweet on a newline:
 
 tweets.txt: 
 
@@ -61,15 +61,15 @@ Although this contains a lot of information, you will only need the hashtags and
 
 You will update the Twitter hashtag graph each time you process a new tweet and hence, the average degree of the graph. The graph should only consist of tweets that arrived in the last 60 seconds as compared to the maximum timestamp that has been processed. 
 
-As new tweets come in, edges formed with tweets older than 60 seconds from the maximum timstamp being processed should be evicted. For each incoming tweet, only extract the following fields in the JSON response
+As new tweets come in, edges formed with tweets older than 60 seconds from the maximum timestamp being processed should be evicted. For each incoming tweet, only extract the following fields from the JSON response
 
 * "hashtags" - hashtags found in the tweet
 * "timestamp_ms" - timestamp of the tweet
 
-Although the hastags also appear in "text" field, no need to go through the effort of extracting the hashtags from that field since there already is a "hashtag" field.  Also, although there is "created\_at" field, please use the "timestamp_ms" field.
+Although the hastags also appear in the "text" field, there is no need to go through the effort of extracting the hashtags from that field since there already is a "hashtags" field.  Also, although there is "created\_at" field, please use the "timestamp_ms" field.
 
 ### Building the Twitter Hashtag Graph
-Example of extracted info from 4 tweets
+Here is an example of the extracted information from 4 tweets:
 
 ```
 hashtags = [Spark , Apache], timestamp_ms: 1446218910005
@@ -84,7 +84,7 @@ hashtags = [HBase, Spark], timestamp_ms: 1446218970004
 hashtags = [Spark, GraphX], timestamp_ms: 1446218970006
 ```
 
-Note that the the order of the tweets coming in **are not ordered by time**, which mimics what one would get from Twitter's streaming API.  Two hashtags will be connected if and only if they are present in the same tweet. Only tweets that contain two or more distinct hashtags can create new edges.
+Note that the the order of the tweets coming in **are not ordered by time**, which mimics what one would get from Twitter's actual streaming API.  Two hashtags will be connected if and only if they are present in the same tweet. Only tweets that contain two or more distinct hashtags can create new edges.
 
 In this case, the first tweet that enters your system has a time-stamp of `1446218910005`.  Take the first tweet's time-stamp **as your initial starting time t\_0 and any tweets with time-stamp below t\_0 should be discarded**.  
 

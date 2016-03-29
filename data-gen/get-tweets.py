@@ -32,9 +32,10 @@ class StdOutListener(StreamListener):
         if not os.path.isfile(self.filename):    # check if file doesn't exist
             f = file(self.filename, 'w')
             f.close()
-        with open(self.filename, 'ab') as f:
+        with open(self.filename, 'ab') as f:     
             print "writing to {}".format(self.filename)
             f.write(data)
+            print data[1]
         f.closed
         
     # this is the event handler for errors    
