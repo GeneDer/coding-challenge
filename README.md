@@ -7,7 +7,7 @@ For this coding challenge, you will develop tools that could help analyze the co
 
 This challenge requires you to:
 
-Calculate the average degree of a vertex in a Twitter hashtag graph for the last 60 seconds, and update this each time a new tweet appears.
+Calculate the average degree of a vertex in a Twitter hashtag graph for the last 60 seconds, and update this each time a new tweet appears.  You will thus be doing a calcuation of the average degree over 60 second sliding windows.
 
 Here, we have to define a few concepts (though there will be examples below to clarify):
 
@@ -47,9 +47,11 @@ One example of the data for a single Tweet might look like:
 "default_profile":false,"default_profile_image":false,"following":null,"follow_request_sent":null,"notifications":null},"geo":{"type":"Point","coordinates":[37.4484914,-122.1802812]},"coordinates":{"type":"Point","coordinates":[-122.1802812,37.4484914]},"place":{"id":"490bdb082950484f",
 "url":"https:\/\/api.twitter.com\/1.1\/geo\/id\/490bdb082950484f.json","place_type":"city","name":"Menlo Park","full_name":"Menlo Park, CA",
 "country_code":"US","country":"United States","bounding_box":{"type":"Polygon","coordinates":[[[-122.228635,37.416515],[-122.228635,37.507328],[-122.120415,37.507328],[-122.120415,37.416515]]]},
-"attributes":{}},"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,"entities":{<b>"hashtags":[{"text":"hiring","indices":[6,13]},{"text":"BusinessMgmt","indices":[69,82]},{"text":"NettempsJobs","indices":[83,96]},{"text":"MenloPark","indices":[97,107]},
+"attributes":{}},"contributors":null,"is_quote_status":false,"retweet_count":0,"favorite_count":0,
+"entities":{<b>"hashtags":[{"text":"hiring","indices":[6,13]},{"text":"BusinessMgmt","indices":[69,82]},{"text":"NettempsJobs","indices":[83,96]},{"text":"MenloPark","indices":[97,107]},
 {"text":"Job","indices":[112,116]},{"text":"Jobs","indices":[117,122]},{"text":"CareerArc","indices":[123,133]}]</b>,"urls":[{"url":"https:\/\/t.co\/lAy8j01BkE",
-"expanded_url":"http:\/\/bit.ly\/1XEF1ja","display_url":"bit.ly\/1XEF1ja","indices":[45,68]}],"user_mentions":[],"symbols":[]},"favorited":false,"retweeted":false,"possibly_sensitive":false,"filter_level":"low","lang":"en",<b>"timestamp_ms":"1446218985079"</b>}
+"expanded_url":"http:\/\/bit.ly\/1XEF1ja","display_url":"bit.ly\/1XEF1ja","indices":[45,68]}],"user_mentions":[],"symbols":[]},"favorited":false,"retweeted":false,"possibly_sensitive":false,"filter_level":"low","lang":"en",
+<b>"timestamp_ms":"1446218985079"</b>}
 
 </pre>
 
@@ -57,31 +59,68 @@ Although this contains a lot of information, you will only need the hashtags and
 
 ## Implementation Details
 
-You will continually update the Twitter hashtag graph and hence, the average degree of the graph. The graph should just be built using tweets that arrived in the last 60 seconds as compared to the timestamp of the latest tweet. As new tweets come in, edges formed with tweets older than 60 seconds from the timstamp of the latest tweet should be evicted. For each incoming tweet, only extract the following fields in the JSON response
+You will update the Twitter hashtag graph each time you process a new tweet and hence, the average degree of the graph. The graph should only consist of tweets that arrived in the last 60 seconds as compared to the maximum timestamp that has been processed. 
+
+As new tweets come in, edges formed with tweets older than 60 seconds from the maximum timstamp being processed should be evicted. For each incoming tweet, only extract the following fields in the JSON response
 
 * "hashtags" - hashtags found in the tweet
 * "timestamp_ms" - timestamp of the tweet
 
-Although the hastags also appear in "text" field, no need to go through the effort of extracting the hashtags from that field since there already is a "hashtag" field.  Also, although there is "created\_at" field, please use the "timestamp_ms" field. 
+Although the hastags also appear in "text" field, no need to go through the effort of extracting the hashtags from that field since there already is a "hashtag" field.  Also, although there is "created\_at" field, please use the "timestamp_ms" field.
 
 ### Building the Twitter Hashtag Graph
 Example of extracted info from 4 tweets
 
 ```
-hashtags = [Spark , Apache], timestamp_ms: 1446218980000
-hashtags = [Apache , NoSQL],  timestamp_ms: 1446218980000
-hashtags = [Apache, Hadoop, Storm], timestamp_ms: 1446218980000
-hashtags = [Apache], timestamp_ms: 1446218980000
-hashtags = [Flink, Spark], timestamp_ms: 1446218980000
+hashtags = [Spark , Apache], timestamp_ms: 1446218910005
+hashtags = [Apache , NoSQL],  timestamp_ms: 1446218910003
+hashtags = [Apache, Hadoop, Storm], timestamp_ms: 1446218910007
+hashtags = [Apache], timestamp_ms: 1446218910012
+.
+.
+.
+hashtags = [Flink, Spark], timestamp_ms: 1446218970003
+hashtags = [HBase, Spark], timestamp_ms: 1446218970004
+hashtags = [Spark, GraphX], timestamp_ms: 1446218970006
 ```
 
-Note that the the order of the tweets coming in **are not ordered by time**, which mimics what one would get from Twitter's streaming API.  Two hashtags will be connected if and only if they are present in the same tweet. Only tweets that contain two or more **DISTINCT** hashtags can create new edges.
+Note that the the order of the tweets coming in **are not ordered by time**, which mimics what one would get from Twitter's streaming API.  Two hashtags will be connected if and only if they are present in the same tweet. Only tweets that contain two or more distinct hashtags can create new edges.
 
-In this case, the first tweet that enters your system has a time-stamp of `7:51:30`.  Take the first tweet's time-stamp **as your initial starting time t0 and any tweets with time-stamp below t0 should be discarded**.  
+In this case, the first tweet that enters your system has a time-stamp of `1446218910005`.  Take the first tweet's time-stamp **as your initial starting time t\_0 and any tweets with time-stamp below t\_0 should be discarded**.  
 
 A good way to create this graph is with an edge list where an edge is defined by two hashtags that are connected. 
 
-The edge list made by all the tweets with time-stamp larger than the initial time is:
+The edge list made by all the tweets with time-stamp larger than the initial time and within the first 60 second window:
+
+```
+#Spark <-> #Apache
+
+#Apache <-> #Hadoop
+#Hadoop <-> #Storm 
+#Storm <-> #Apache
+
+#Flink <-> #Spark
+
+#HBase <-> #Spark
+```
+
+Notice that `#Apache <-> #NoSQL` did not generate a new edge since the time stamp is before the first tweet.  Moreover, the fourth tweet did not generate a new edge since there were no other hashtags besides `#Apache` in that tweet. Although `#Spark <-> #GraphX` appears in the sedond window, it does not appear in the first window --  The edge list for the second window being:
+
+```
+#Apache <-> #Hadoop
+#Hadoop <-> #Storm 
+#Storm <-> #Apache
+
+#Flink <-> #Spark
+
+#HBase <-> #Spark
+
+#Spark <-> #GraphX
+```
+
+The edge list can be visualized with the following diagrams where each node is a hashtag. The first tweet will generate the `#Spark` and `#Apache` nodes.
+
+![spark-apache-graph](images/htag_graph_1.png)
 
 ```
 #Spark <-> #Apache
@@ -93,19 +132,11 @@ The edge list made by all the tweets with time-stamp larger than the initial tim
 #Flink <-> #Spark
 ```
 
-Notice that `#Apache <-> #NoSQL` did not generate a new edge since the time stamp is before the first tweet.  Moreover, the third tweet did not generate a new edge since there were no other hashtags besides `#Apache` in that tweet. Also, all tweets occured in the 60 seconds time window as compared to the latest tweet and they all are included in building the graph.
-
-The edge list can be visualized with the following diagrams where each node is a hashtag. The first tweet will generate the `#Spark` and `#Apache` nodes.
-
-![spark-apache-graph](images/htag_graph_1.png)
-
-The first tweet contains 3 hashtags `#Apache`, `#Hadoop`, and `#Storm`, while the second tweet contains 2 hashtags `#Apache` and `#Spark`, hence the graph for those two tweets looks like
+The first tweet contains 2 hashtags `#Spark` and `#Apache`, the second tweet is not added to the edge list, the third tweet contains 3 hashtags `#Apache`, `#Hadoop` and `#Storm`, hence the graph for those three tweets looks like
 
 ![apache-hadoop-storm-graph](images/htag_graph_2.png)
 
-The third tweet generated no edges, so no new nodes will be added to the graph.
-
-The fourth tweet contains `#Flink` and `#Spark`. `#Spark` already exists, so only `#Flink` will be added.
+The fourth tweet only contains one hashtag, and thus does not contribute to the edge list. The third to last tweet contains `#Flink` and `#Spark`. `#Spark` already exists, so only `#Flink` will be added.
 
 ![flink-spark-graph](images/htag_graph_3.png)
 
@@ -123,24 +154,25 @@ The rolling average degree since the 4th tweet is now
 ```
 
 ### Modifying the Twitter Hashtag Graph with Incoming Tweet
-Now let's say another tweet has arrived, with hashtags and timestamp
+
+Going back to the example, when the tweet
 
 ```
-hashtags = [HBase, Spark], timestamp_ms: 1446218980000
+hashtags = [HBase, Spark], timestamp_ms: 1446218970006
 ```
 
-and added to the edge list
+arrived and added to the edge list
 
 ```
-#Apache <-> #Hadoop
-#Hadoop <-> #Storm
-#Storm <-> #Apache
-
 #Spark <-> #Apache
+
+#Apache <-> #Hadoop
+#Hadoop <-> #Storm 
+#Storm <-> #Apache
 
 #Flink <-> #Spark
 
-#HBase <-> $Spark
+#HBase <-> #Spark
 ```
 
 The graph now looks like the following
@@ -163,6 +195,8 @@ The rolling average degree since the 4th tweet is now
 ```
 
 ### Maintaining Data within the 60 Second Window
+
+
 Now let's say that the next two tweets that come in have the following timestamps
 
 ```
