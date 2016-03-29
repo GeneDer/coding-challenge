@@ -64,7 +64,7 @@ As new tweets come in, edges formed with tweets older than 60 seconds from the m
 * **"hashtags"** - hashtags found in the tweet
 * **"created_at"** - timestamp of the tweet
 
-Although the hastags also appear in the "text" field, there is no need to go through the effort of extracting the hashtags from that field since there already is a "hashtags" field.
+Although the hashtags also appear in the "text" field, there is no need to go through the effort of extracting the hashtags from that field since there already is a "hashtags" field.
 
 ## Building the Twitter Hashtag Graph
 
@@ -83,12 +83,7 @@ Two hashtags will be connected if and only if they are present in the same tweet
 
 A good way to create this graph is with an edge list where an edge is defined by two hashtags that are connected.
 
-In this case, the first tweet that enters the system has a timestamp of 
-
-```
-Thu Mar 24 17:51:10 +0000 2016
-``` 
-and the edges formed are 
+In this case, the first tweet that enters the system has a timestamp of `Thu Mar 24 17:51:10 +0000 2016` and the edge formed is 
 
 ```
 Spark <-> Apache
@@ -107,7 +102,7 @@ The rolling average degree output is
 ```
 The second tweet is in order and it will form new edges in the graph.
 
-The edge list by both these tweets are:
+The edge list by first two tweets are:
 
 ```
 #Spark <-> #Apache
@@ -130,7 +125,7 @@ The rolling average degree output is
 2.00
 ```
 
-The third tweet generated no edges, so no new nodes will be added to the graph. The rolling average degree output now is:
+The third tweet has only one hashtag and hence, it doesn't generate any edges, so no new nodes will be added to the graph. The rolling average degree output is:
 
 ```
 1.00
@@ -286,14 +281,14 @@ The rolling average degree now becomes
 
 ## Dealing with tweets which arrive out of order in time
 
-Tweets which are out of order and fall within 60 sec window of the maximum timestamp processed will create new edges in the graph. However, tweets which are out of order in time and are outside the 60 sec window of the maximum timestamp processed, should be ignored and such tweets won't contribute to building the graph. Its easiest to understand with an example.
+Tweets which are out of order and fall within 60 sec window of the maximum timestamp processed or in other words, are less than 60 sec older than the maximum timestamp being processed, will create new edges in the graph. However, tweets which are out of order in time and are outside the 60 sec window of the maximum timestamp processed (or more than 60 sec older than the maximum timestamp being processed) should be ignored and such tweets won't contribute to building the graph. Its easiest to understand this with an example.
 
 Let's say that a new tweet comes in and the extracted information is
 
 ```
 hashtags = [Flink, HBase], created_at: Thu Mar 24 17:52:10 +0000 2016
 ```
-This tweet is out of order in time but falls within the 60 second time window of the maximum time processed (latest timestamp), i.e., *Thu Mar 24 17:52:12 +0000 2016*.
+This tweet is out of order in time but falls within the 60 second time window of the maximum timestamp processed (latest timestamp), i.e., *Thu Mar 24 17:52:12 +0000 2016*.
 
 The new hashtags to be used in constructing the graph are as follows
 
@@ -344,7 +339,7 @@ Now, let's say that a new tweet comes in and the extracted information is
 ```
 hashtags = [Cassandra, NoSQL], created_at: Thu Mar 24 17:51:10 +0000 2016
 ```
-This tweet is out of order and is outside the 60 second window of the maximum timestamp processed (latest timestamp). This tweet should be ignored. It will not form new edges and will not contribute to the graph formation. The graph remains the same as before this tweet arrived.
+This tweet is out of order and is outside the 60 second window of the maximum timestamp processed (latest timestamp),  i.e., Thu Mar 24 17:52:12 +0000 2016. This tweet should be ignored. It will not form new edges and will not contribute to the graph formation. The graph remains the same as before this tweet arrived.
 
 Consider that a new tweet arrives and the extracted information is
 
