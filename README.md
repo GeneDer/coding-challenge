@@ -1,7 +1,7 @@
 Insight Data Engineering - Coding Challenge
 ===========================================================
 
-For this coding challenge, you will develop tools that could help analyze the community of Twitter users.  For simplicity, the features we will build are primitive, but you could easily build more complicated features on top of these.   
+For this coding challenge, you will develop tools that could help analyze the community of Twitter users.  Some of the challenges here mimic real world problems.
 
 ## Challenge Summary
 
@@ -9,9 +9,7 @@ This challenge requires you to:
 
 Calculate the average degree of a vertex in a Twitter hashtag graph for the last 60 seconds, and update this each time a new tweet appears.  You will thus be calculating the average degree over a 60-second sliding window.
 
-Here, we have to define a few concepts (though there will be examples below to clarify):
-
-- A Twitter hashtag graph is a graph connecting all the hashtags that have been mentioned together in a single tweet.
+To clarify, a Twitter hashtag graph is a graph connecting all the hashtags that have been mentioned together in a single tweet.  Examples of Twitter hashtags graphs are below.
 
 ## Details of Implementation
 
@@ -61,10 +59,7 @@ You will update the Twitter hashtag graph each time you process a new tweet and 
 
 As new tweets come in, edges formed with tweets older than 60 seconds from the maximum timestamp being processed should be evicted. For each incoming tweet, only extract the following fields from the JSON response
 
-* **"hashtags"** - hashtags found in the tweet
-* **"created_at"** - timestamp of the tweet
-
-Although the hashtags also appear in the "text" field, there is no need to go through the effort of extracting the hashtags from that field since there already is a "hashtags" field.
+Although the hashtags also appear in the "text" field, there is no need to go through the effort of extracting the hashtags from that field since there already is a "hashtags" field.  Similarly, although there is a "timestamp\_ms" field, please only use the "created\_at" field.
 
 ## Building the Twitter Hashtag Graph
 
@@ -79,7 +74,7 @@ hashtags = [Flink, Spark],          created_at: Thu Mar 24 17:51:55 +0000 2016
 
 Two hashtags will be connected if and only if they are present in the same tweet. Only tweets that contain two or more **DISTINCT** hashtags can create new edges.
 
-**NOTE:** The the order of the tweets coming in **might not be ordered by time** (we'll see an example below on how to deal with tweets which are out of order in time), which mimics what one would get from Twitter's streaming API. 
+**NOTE:** The order of the tweets coming in **might not be ordered by time** (we'll see an example below on how to deal with tweets which are out of order in time), which mimics what one would get from Twitter's streaming API. 
 
 A good way to create this graph is with an edge list where an edge is defined by two hashtags that are connected.
 
@@ -207,8 +202,6 @@ The rolling average degree is
 2.00
 2.00
 ```
-
-## 
 
 ## Maintaining Data within the 60 Second Window
 Now let's say that the next tweet comes in and the extracted information is 
