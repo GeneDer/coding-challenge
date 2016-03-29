@@ -404,26 +404,27 @@ You may write your solution in any mainstream programming language such as C, C+
 Alternatively, here is example output of the `tree` command:
 
 	├── README.md 
-	├── insight_testsuite
-	│   ├── run_tests.sh
-	│   └── tests
-	│       └── test-2-tweets-all-distinct
-	│       │    ├── tweet_input
-	│       │    │   └── tweets.txt 
-	│       │    └── tweet_output
-	│       │        └── output.txt
-	│       └── your-own-test
-	│           ├── tweet_input
-	│           │   └── tweets.txt 
-	│           └── tweet_output
-	│               └── output.txt
-	├── run.sh  
-	├── src  
-	│   └── average_degree.py    
-	├── tweet_input  
-	│   └── tweets.txt  
-	└── tweet_output  
-	    └── output.txt    
+	├── run.sh
+	├── src
+	│   └── average_degree.py
+	├── tweet_input
+	│   └── tweets.txt
+	├── tweet_output
+	│   └── output.txt
+	└── insight_testsuite
+	    ├── run_tests.sh
+	    └── tests
+	        └── test-2-tweets-all-distinct
+	        │   ├── tweet_input
+	        │   │   └── tweets.txt
+	        │   └── tweet_output
+	        │       └── output.txt
+	        └── your-own-test
+	            ├── tweet_input
+	            │   └── tweets.txt
+	            └── tweet_output
+	                └── output.txt
+
 
 The contents of `src` do not have to contain a single file called "average_degree.py", you are free to include one or more files and name them as you wish.  
 
