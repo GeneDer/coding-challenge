@@ -524,14 +524,11 @@ You should replace the escape characters as follows:
 ```                                                                                                            
 &nbsp;&nbsp;&nbsp;&nbsp;Also, all whitespace escape characters should be replaced with a single space. 
 
-* *Can tweets in the tweets.txt file be out of order?*           						    
-No, for simplicity you can assume that the incoming tweets are in order. Although tweets from Twitter API may be out of order sometimes, the testing suite will test your code with all the tweets in order.
-
 * *Will the JSON input contain the hashtag entity, or do I have to extract it from the text?*                                       
 You may use the hashtags directly from the entity field of the JSON, or you may extract it from the text.  In either case, you will need to make the hashtags have been "cleaned" as described in feature 1.  
 
 * *Can hashtags contain unicode characters and how should these be handled?*                                       
-Yes, hashtags can contain unicode characters. You should clean hashtags in feature 2 the same way you clean a tweet in feature 1. (WHAT ABOUT THIS?) -- MENTION TO SIMPLY USE THE HASHTAG ENTITY IN THE JSON FORMAT OF TWEETS
+Yes, hashtags can contain unicode characters. You should clean hashtags in feature 2 the same way you clean a tweet in feature 1.
 
 * *Do I need to account for empty tweets?*  
 No, for simplicity you may assume that all the tweets contain at least one word.  However, many tweets contain only unicode chracters, which will be effectively empty after you clean them.  This means you will have to test properly when implementing on real data.   
