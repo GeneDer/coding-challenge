@@ -1,6 +1,18 @@
 Insight Data Engineering - Coding Challenge
 ===========================================================
 
+# Table of Contents
+1. [Challenge Summary](README.md#challenge-summary)
+2. [Details of Implementation](README.md#details-of-implementation)
+3. [Building the Twitter Hashtag Graph](README.md#building-the-twitter-hashtag-graph)
+4. [Modifying the Twitter Hashtag Graph with Incoming Tweet](README.md#modifying-the-twitter-hashtag-graph-with-incoming-tweet)
+5. [Maintaining Data within the 60 Second Window](README.md#maintaining-data-within-the-60-second-window)
+6. [Dealing with tweets which arrive out of order in time](README.md#dealing-with-tweets-which-arrive-out-of-order-in-time)
+7. [Collecting tweets from the Twitter API](README.md#collecting-tweets-from-the-twitter-api)
+8. [Writing clean, scalable, and well-tested code](README.md#writing-clean-scalable-and-well-tested-code)
+9. [Testing your directory structure and output format](README.md#testing-your-directory-structure-and-output-format)
+10. [FAQ](README.md#faq)
+
 For this coding challenge, you will develop tools that could help analyze the community of Twitter users.  Some of the challenges here mimic real world problems.
 
 ## Challenge Summary
@@ -404,26 +416,26 @@ You may write your solution in any mainstream programming language such as C, C+
 Alternatively, here is example output of the `tree` command:
 
 	├── README.md 
-	├── insight_testsuite
-	│   ├── run_tests.sh
-	│   └── tests
-	│       └── test-2-tweets-all-distinct
-	│       │    ├── tweet_input
-	│       │    │   └── tweets.txt 
-	│       │    └── tweet_output
-	│       │        └── output.txt
-	│       └── your-own-test
-	│           ├── tweet_input
-	│           │   └── tweets.txt 
-	│           └── tweet_output
-	│               └── output.txt
-	├── run.sh  
-	├── src  
-	│   └── average_degree.java    
-	├── tweet_input  
-	│   └── tweets.txt  
-	└── tweet_output  
-	    └── output.txt    
+	├── run.sh
+	├── src
+	│   └── average_degree.java
+	├── tweet_input
+	│   └── tweets.txt
+	├── tweet_output
+	│   └── output.txt
+	└── insight_testsuite
+	    ├── run_tests.sh
+	    └── tests
+	        └── test-2-tweets-all-distinct
+	        │   ├── tweet_input
+	        │   │   └── tweets.txt
+	        │   └── tweet_output
+	        │       └── output.txt
+	        └── your-own-test
+	            ├── tweet_input
+	            │   └── tweets.txt
+	            └── tweet_output
+	                └── output.txt
 
 The contents of `src` do not have to contain a single file called "average_degree.py", you are free to include one or more files and name them as you wish.  
 
