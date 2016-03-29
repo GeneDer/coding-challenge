@@ -16,6 +16,7 @@ Insight Data Engineering - Coding Challenge
 For this coding challenge, you will develop tools that could help analyze the community of Twitter users.  Some of the challenges here mimic real world problems.
 
 ## Challenge Summary
+[Back to Table of Contents](README.md#table-of-contents)
 
 This challenge requires you to:
 
@@ -24,6 +25,7 @@ Calculate the average degree of a vertex in a Twitter hashtag graph for the last
 To clarify, a Twitter hashtag graph is a graph connecting all the hashtags that have been mentioned together in a single tweet.  Examples of Twitter hashtags graphs are below.
 
 ## Details of Implementation
+[Back to Table of Contents](README.md#table-of-contents)
 
 We'd like you to implement your own version of this.  However, we don't want this challenge to focus on the relatively uninteresting "dev ops" of connecting to the Twitter API, which can be complicated for some users.  Normally, tweets can be obtained through Twitter's API in JSON format, but you may assume that this has already been done and written to a file named `tweets.txt` inside a directory named `tweet_input`.  
 
@@ -74,6 +76,7 @@ As new tweets come in, edges formed with tweets older than 60 seconds from the m
 Although the hashtags also appear in the "text" field, there is no need to go through the effort of extracting the hashtags from that field since there already is a "hashtags" field.  Similarly, although there is a "timestamp\_ms" field, please only use the "created\_at" field.
 
 ## Building the Twitter Hashtag Graph
+[Back to Table of Contents](README.md#table-of-contents)
 
 Here is an example of the extracted information from 4 tweets:
 
@@ -172,6 +175,7 @@ The rolling average degree output at the end of fourth tweet is
 Note that all the tweets are in order of time in this example and for every incoming tweet, all the old tweets are in the 60 second window of the timestamp of the latest incoming tweet and hence, no tweets are evicted (we'll see an example below on how the edge eviction should be handled with time).
 
 ## Modifying the Twitter Hashtag Graph with Incoming Tweet
+[Back to Table of Contents](README.md#table-of-contents)
 
 Now let's say another tweet has arrived and the extracted information is
 
@@ -216,6 +220,8 @@ The rolling average degree is
 ```
 
 ## Maintaining Data within the 60 Second Window
+[Back to Table of Contents](README.md#table-of-contents)
+
 Now let's say that the next tweet comes in and the extracted information is 
 
 ```
@@ -285,6 +291,7 @@ The rolling average degree now becomes
 ```
 
 ## Dealing with tweets which arrive out of order in time
+[Back to Table of Contents](README.md#table-of-contents)
 
 Tweets which are out of order and fall within 60 sec window of the maximum timestamp processed or in other words, are less than 60 sec older than the maximum timestamp being processed, will create new edges in the graph. However, tweets which are out of order in time and are outside the 60 sec window of the maximum timestamp processed (or more than 60 sec older than the maximum timestamp being processed) should be ignored and such tweets won't contribute to building the graph. Its easiest to understand this with an example.
 
@@ -402,6 +409,8 @@ The output should be a file in the `tweet_output` directory named `output.txt` t
 
 
 ## Collecting tweets from the Twitter API
+[Back to Table of Contents](README.md#table-of-contents)
+
 Ideally, the updates of the average degree of a Twitter hashtag graph as each tweet arrives would be connected to the Twitter streaming API and would add new tweets to the end of `tweets.txt`.  However, connecting to the API requires more system specific "dev ops" work, which isn't the primary focus for data engineers.  Instead, you should simply assume that each new line of the text file corresponds to a new tweet and design your program to handle a text file with a large number of tweets.  Your program should output the results to a text file named `output.txt` in the `tweet_output` directory.
 
 
@@ -411,6 +420,8 @@ As a data engineer, it’s important that you write clean, well-documented code 
 You may write your solution in any mainstream programming language such as C, C++, C#, Clojure, Erlang, Go, Haskell, Java, Python, Ruby, or Scala - then submit a link to a Github repo with your source code.  In addition to the source code, the top-most directory of your repo must include the `tweet_input` and `tweet_output` directories, and a shell script named `run.sh` that compiles and runs the program(s) that implement these features.  If your solution requires additional libraries, environments, or dependencies, you must specify these in your README documentation.  See the figure below for the required structure of the top-most directory in your repo, or simply clone this repo.
 
 ## Repo directory structure
+[Back to Table of Contents](README.md#table-of-contents)
+
 ![Example Repo Structure](images/directory-pic.png)
 
 Alternatively, here is example output of the `tree` command:
@@ -440,6 +451,8 @@ Alternatively, here is example output of the `tree` command:
 The contents of `src` do not have to contain a single file called "average_degree.java", you are free to include one or more files and name them as you wish.  
 
 ## Testing your directory structure and output format
+[Back to Table of Contents](README.md#table-of-contents)
+
 To make sure that your code has the correct directory strucure and the format of the output data in output.txt is correct, we included a test script, called `run_tests.sh` in the insight_testsuite folder.
 
 The tests are stored simply as text files under the `insight_testsuite/tests` folder. Each test should have a separate folder and within should have a `tweet_input` folder for `tweets.txt` and a `tweet_output` folder for `output.txt` corresponding to the current test.
@@ -466,6 +479,7 @@ One test has been provided as a way to check your formatting and simulate how we
   **Your submission must pass at least the provided test in order to pass the coding challenge**.  
 
 ## FAQ
+[Back to Table of Contents](README.md#table-of-contents)
 
 Here are some common questions we've received.  If you have additional questions, please email cc@insightdataengineering.com and we'll answer your questions as quickly as we can.
 
