@@ -413,27 +413,55 @@ You may write your solution in any mainstream programming language such as C, C+
 
 Alternatively, here is example output of the `tree` command:
 
-	├── README.md  
+	├── README.md 
+	├── insight_testsuite
+	│   ├── run_tests.sh
+	│   └── tests
+	│       └── test-2-tweets-all-distinct
+	│       │    ├── tweet_input
+	│       │    │   └── tweets.txt 
+	│       │    └── tweet_output
+	│       │        └── output.txt
+	│       └── your-own-test
+	│           ├── tweet_input
+	│           │   └── tweets.txt 
+	│           └── tweet_output
+	│               └── output.txt
 	├── run.sh  
 	├── src  
-	│   ├── average_degree.py    
+	│   └── average_degree.py    
 	├── tweet_input  
-	│   └── tweets.txt  
+	│   └── tweets.txt  
 	└── tweet_output  
-	    ├── output.txt    
+	    └── output.txt    
 
 The contents of `src` do not have to contain a single file called "average_degree.py", you are free to include one or more files and name them as you wish.  
 
 ## Testing your directory structure and output format
-To make sure that your code has the correct directory strucure and the format of the output data in output.txt is correct, we included a test, called `test.sh`.
+To make sure that your code has the correct directory strucure and the format of the output data in output.txt is correct, we included a test script, called `run_tests.sh` in the insight_testsuite folder.
 
-The output of `test.sh` sould look like:
+The tests are stored simply as text files under the `insight_testsuite/tests` folder. Each test should have a separate folder and within should have a `tweet_input` folder for `tweets.txt` and a `tweet_output` folder for `output.txt` corresponding to the current test.
 
+You can run the test with the following from the insight_testsuite folder:
+```bash
+insight_testsuite$ ./run_tests.sh 
 ```
-BLAH BLAH
-```
 
-If it does not, then an error message will occur indicating that you need to modify your directory or output data structure.  **Your submission must pass these tests in order to pass the coding challenge**.  
+The output of `run_tests.sh` sould look like:
+```bash
+[FAIL]: test-2-tweets-all-distinct
+[Tue Mar 29 2016 11:59:59] 0 of 1 tests passed
+```
+on failed tests and
+```bash
+[PASS]: test-2-tweets-all-distinct
+[Tue Mar 29 2016 11:59:59] 1 of 1 tests passed
+```
+on success
+
+One test has been provided as a way to check your formatting and simulate how we will be running tests when you submit your solution. We urge you to write your own additional tests here as well as for your own programming language. `run_tests.sh` should alert you if the directory structure is incorrect. 
+
+  **Your submission must pass at least the provided test in order to pass the coding challenge**.  
 
 ## FAQ
 
