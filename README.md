@@ -7,7 +7,7 @@ For this coding challenge, you will develop tools that could help analyze the co
 
 This challenge requires you to:
 
-Calculate the average degree of a vertex in a Twitter hashtag graph for the last 60 seconds, and update this each time a new tweet appears.  You will thus be doing a calcuation of the average degree over 60 second sliding windows.
+Calculate the average degree of a vertex in a Twitter hashtag graph for the last 60 seconds, and update this each time a new tweet appears.  You will thus be calculating the average degree over 60 second sliding windows.
 
 Here, we have to define a few concepts (though there will be examples below to clarify):
 
@@ -17,9 +17,9 @@ Here, we have to define a few concepts (though there will be examples below to c
 
 We'd like you to implement your own version of this.  However, we don't want this challenge to focus on the relatively uninteresting "dev ops" of connecting to the Twitter API, which can be complicated for some users.  Normally, tweets can be obtained through Twitter's API in JSON format, but you may assume that this has already been done and written to a file named `tweets.txt` inside a directory named `tweet_input`.  
 
-For simplicity, this file `tweets.txt` will only contain the actual JSON messages (in reality, the API also can emit messages about the connection and the API rate limits).  Additionally, `tweets.txt` will have the content of each tweet on a newline:
+The file `tweets.txt` will contain the actual JSON messages received from the Twitter API. Note that the input file `tweets.txt` may also contain messages about the connection and API rate limits. Ignore these messages about connection and API rate limits in your code and don't have them account for the output. Additionally, `tweets.txt` will have the content of each tweet on a newline:
 
-tweets.txt: 
+`tweets.txt`: 
 
 	{JSON of first tweet}  
 	{JSON of second tweet}  
@@ -55,88 +55,100 @@ One example of the data for a single Tweet might look like:
 
 </pre>
 
-Although this contains a lot of information, you will only need the hashtags and timestamp of each entry, which are in bold in the above entry.
-
-## Implementation Details
+Although this contains a lot of information, you will only need the **hashtags** and **timestamp_ms** fields of each entry, which are in bold in the above entry.
 
 You will update the Twitter hashtag graph each time you process a new tweet and hence, the average degree of the graph. The graph should only consist of tweets that arrived in the last 60 seconds as compared to the maximum timestamp that has been processed. 
 
 As new tweets come in, edges formed with tweets older than 60 seconds from the maximum timstamp being processed should be evicted. For each incoming tweet, only extract the following fields in the JSON response
 
-* "hashtags" - hashtags found in the tweet
-* "timestamp_ms" - timestamp of the tweet
+* **"hashtags"** - hashtags found in the tweet
+* **"timestamp_ms"** - timestamp of the tweet
 
 Although the hastags also appear in "text" field, no need to go through the effort of extracting the hashtags from that field since there already is a "hashtag" field.  Also, although there is "created\_at" field, please use the "timestamp_ms" field.
 
-### Building the Twitter Hashtag Graph
-Example of extracted info from 4 tweets
+## Building the Twitter Hashtag Graph
+Example of extracted infotmation from 4 tweets
 
 ```
-hashtags = [Spark , Apache], timestamp_ms: 1446218910005
-hashtags = [Apache , NoSQL],  timestamp_ms: 1446218910003
-hashtags = [Apache, Hadoop, Storm], timestamp_ms: 1446218910007
-hashtags = [Apache], timestamp_ms: 1446218910012
-.
-.
-.
-hashtags = [Flink, Spark], timestamp_ms: 1446218970003
-hashtags = [HBase, Spark], timestamp_ms: 1446218970004
-hashtags = [Spark, GraphX], timestamp_ms: 1446218970006
+hashtags = [Spark , Apache],        created_at: Thu Mar 24 17:51:10 +0000 2016
+hashtags = [Apache, Hadoop, Storm], created_at: Thu Mar 24 17:51:15 +0000 2016
+hashtags = [Apache],                created_at: Thu Mar 24 17:51:30 +0000 2016
+hashtags = [Flink, Spark],          created_at: Thu Mar 24 17:51:55 +0000 2016
 ```
 
-Note that the the order of the tweets coming in **are not ordered by time**, which mimics what one would get from Twitter's streaming API.  Two hashtags will be connected if and only if they are present in the same tweet. Only tweets that contain two or more distinct hashtags can create new edges.
+Two hashtags will be connected if and only if they are present in the same tweet. Only tweets that contain two or more **DISTINCT** hashtags can create new edges.
 
-In this case, the first tweet that enters your system has a time-stamp of `1446218910005`.  Take the first tweet's time-stamp **as your initial starting time t\_0 and any tweets with time-stamp below t\_0 should be discarded**.  
+**NOTE:** The the order of the tweets coming in **might not be ordered by time** (we'll see an example below on how to deal with tweets which are out of order in time), which mimics what one would get from Twitter's streaming API. 
 
-A good way to create this graph is with an edge list where an edge is defined by two hashtags that are connected. 
+A good way to create this graph is with an edge list where an edge is defined by two hashtags that are connected.
 
-The edge list made by all the tweets with time-stamp larger than the initial time and within the first 60 second window:
-
-```
-#Spark <-> #Apache
-
-#Apache <-> #Hadoop
-#Hadoop <-> #Storm 
-#Storm <-> #Apache
-
-#Flink <-> #Spark
-
-#HBase <-> #Spark
-```
-
-Notice that `#Apache <-> #NoSQL` did not generate a new edge since the time stamp is before the first tweet.  Moreover, the fourth tweet did not generate a new edge since there were no other hashtags besides `#Apache` in that tweet. Although `#Spark <-> #GraphX` appears in the sedond window, it does not appear in the first window --  The edge list for the second window being:
+In this case, the first tweet that enters the system has a timestamp of 
 
 ```
-#Apache <-> #Hadoop
-#Hadoop <-> #Storm 
-#Storm <-> #Apache
+Thu Mar 24 17:51:10 +0000 2016
+``` 
+and the edges formed are 
 
-#Flink <-> #Spark
-
-#HBase <-> #Spark
-
-#Spark <-> #GraphX
 ```
-
-The edge list can be visualized with the following diagrams where each node is a hashtag. The first tweet will generate the `#Spark` and `#Apache` nodes.
+Spark <-> Apache
+```
 
 ![spark-apache-graph](images/htag_graph_1.png)
 
+The average degree will be calculated by summing the degrees of both nodes in the graph and dividing by the total number of nodes in the graph.
+
+Average Degree = (1+1) / 2 = 1.00
+
+The rolling average degree output is
+
+```
+1.00
+```
+The second tweet is in order and it will form new edges in the graph.
+
+The edge list by both these tweets are:
+
 ```
 #Spark <-> #Apache
 
 #Apache <-> #Hadoop
 #Hadoop <-> #Storm 
 #Storm <-> #Apache
+```
+
+The second tweet contains 3 hashtags `#Apache`, `#Hadoop`, and `#Storm`. `#Apache` already exists in the graph, so only `#Hadoop` and `#Storm` are added to the graph and the graph now is:
+
+![spark-apache-graph](images/htag_graph_2.png)
+
+Average Degree = (1+3+2+2) / 4 = 2.00
+
+The rolling average degree output is
+
+```
+1.00
+2.00
+```
+
+The third tweet generated no edges, so no new nodes will be added to the graph. The rolling average degree output now is:
+
+```
+1.00
+2.00
+2.00
+```
+
+The fourth tweet is in order of time and forms new edges. The edges in the graph  are:
+
+```
+#Spark <-> #Apache
+
+#Apache <-> #Hadoop
+#Hadoop <-> #Storm
+#Storm <-> #Apache
 
 #Flink <-> #Spark
 ```
-
-The first tweet contains 2 hashtags `#Spark` and `#Apache`, the second tweet is not added to the edge list, the third tweet contains 3 hashtags `#Apache`, `#Hadoop` and `#Storm`, hence the graph for those three tweets looks like
-
-![apache-hadoop-storm-graph](images/htag_graph_2.png)
-
-The fourth tweet only contains one hashtag, and thus does not contribute to the edge list. The third to last tweet contains `#Flink` and `#Spark`. `#Spark` already exists, so only `#Flink` will be added.
+The fourth tweet contains `#Flink` and `#Spark`. `#Spark` already exists, so only `#Flink` will be added.
 
 ![flink-spark-graph](images/htag_graph_3.png)
 
@@ -144,93 +156,94 @@ We can now calculate the degree of each node which is defined as the number of c
 
 ![graph-degree3](images/htag_degree_3.png)
 
-The average degree for simplicity will be calculated by summing the degrees of all nodes in all graphs and dividing by the total number of nodes in all graphs.
+Average Degree = (1+2+3+2+2) / 5 = 2.00
 
-Average Degree = (1+2+3+2+2)/5 = 2.00
+The rolling average degree output at the end of fourth tweet is
 
-The rolling average degree since the 4th tweet is now 
 ```
+1.00
+2.00
+2.00
 2.00
 ```
+Note that all the tweets are in order of time in this example and for every incoming tweet, all the old tweets are in the 60 second window of the timestamp of the latest incoming tweet and hence, no tweets are evicted (we'll see an example below on how the edge eviction should be handled with time).
 
-### Modifying the Twitter Hashtag Graph with Incoming Tweet
-
-Going back to the example, when the tweet
+## Modifying the Twitter Hashtag Graph with Incoming Tweet
+Now let's say another tweet has arrived and the extracted information is
 
 ```
-hashtags = [HBase, Spark], timestamp_ms: 1446218970006
+hashtags = [Spark , HBase], created_at: Thu Mar 24 17:51:58 +0000 2016
 ```
 
-arrived and added to the edge list
+The edge list now becomes:
 
 ```
 #Spark <-> #Apache
 
 #Apache <-> #Hadoop
-#Hadoop <-> #Storm 
+#Hadoop <-> #Storm
 #Storm <-> #Apache
 
 #Flink <-> #Spark
 
-#HBase <-> #Spark
+#HBase <-> $Spark
 ```
 
 The graph now looks like the following
 
 ![hbase-spark-graph](images/htag_graph_4.png)
 
-with the updated degree calculation for each node. Here only `#Spark` needs to be incremented due to the additional `#HBase` node.
+The updated degree calculation for each node is as follow. Here only `#Spark` needs to be incremented due to the additional `#HBase` node.
 
 ![graph-degree4](images/htag_degree_4.png)
 
 The average degree will be recalculated using the same formula as before.
 
-Average Degree = (1+3+1+3+2+2)/6 = 2.00
+Average Degree = (1+3+1+3+2+2) / 6 = 2.00
 
-The rolling average degree since the 4th tweet is now 
+The rolling average degree is
 
 ```
+1.00
+2.00
+2.00
 2.00
 2.00
 ```
 
-### Maintaining Data within the 60 Second Window
+## 
 
-
-Now let's say that the next two tweets that come in have the following timestamps
-
-```
-hashtags = [Hadoop, Apache] timestamp_ms: 1446218980000
-
-hashtags = [Spark, GraphX] timestamp_ms: 1446218980000
-```
-
-The full list of tweets now is 
+## Maintaining Data within the 60 Second Window
+Now let's say that the next tweet comes in and the extracted information is 
 
 ```
-hashtags = [Spark , Apache], timestamp_ms: 1446218980000
-hashtags = [Apache , NoSQL],  timestamp_ms: 1446218980000
-hashtags = [Apache, Hadoop, Storm], timestamp_ms: 1446218980000
-hashtags = [Apache], timestamp_ms: 1446218980000
-hashtags = [Flink, Spark], timestamp_ms: 1446218980000
-hashtags = [HBase, Spark], timestamp_ms: 1446218980000
-hashtags = [Hadoop, Apache] timestamp_ms: 1446218980000
-hashtags = [Spark, GraphX] timestamp_ms: 1446218980000
+hashtags = [Hadoop, Apache], created_at: Thu Mar 24 17:52:12 +0000 2016
 ```
 
-We can see that the second tweet has a timestamp that is more than 60 seconds behind this new tweet. This means that we do not want to include our first tweet in our average degree calculation.  Although `#Spark` and `#GraphX` never appeared prior to the last tweet, we do not form an edge `#Spark <-> #GraphX` since the time-stamp is not in the 2nd time window.
-
-The new hashtags to be used are as follows
+Extracted information from all the tweets is
 
 ```
-hashtags = [Apache, Hadoop, Storm], timestamp_ms: 1446218980000
-hashtags = [Apache], timestamp_ms: 1446218980000
-hashtags = [Flink, Spark], timestamp_ms: 1446218980000
-hashtags = [HBase, Spark], timestamp_ms: 1446218980000
-hashtags = [Hadoop, Apache] timestamp_ms: 1446218980000
+hashtags = [Spark , Apache],        created_at: Thu Mar 24 17:51:10 +0000 2016
+hashtags = [Apache, Hadoop, Storm], created_at: Thu Mar 24 17:51:15 +0000 2016
+hashtags = [Apache],                created_at: Thu Mar 24 17:51:30 +0000 2016
+hashtags = [Flink, Spark],          created_at: Thu Mar 24 17:51:55 +0000 2016
+hashtags = [Spark , HBase],         created_at: Thu Mar 24 17:51:58 +0000 2016
+hashtags = [Hadoop, Apache],        created_at: Thu Mar 24 17:52:12 +0000 2016
 ```
 
-The new edge list only has the `#Spark` <-> `#Apache` edge removed since `#Hadoop` <-> `#Apache` from the new tweet already exists in the edge list.
+We can see that the very first tweet has a timestamp that is more than 60 seconds behind this new tweet. This means that the edges formed by the first tweet should be evicted and the first tweet should not be included in our average degree calculation.
+
+The new hashtags to be used in constructing the graph are as follows
+
+```
+hashtags = [Apache, Hadoop, Storm], created_at: Thu Mar 24 17:51:15 +0000 2016
+hashtags = [Apache],                created_at: Thu Mar 24 17:51:30 +0000 2016
+hashtags = [Flink, Spark],          created_at: Thu Mar 24 17:51:55 +0000 2016
+hashtags = [Spark , HBase],         created_at: Thu Mar 24 17:51:58 +0000 2016
+hashtags = [Hadoop, Apache],        created_at: Thu Mar 24 17:52:12 +0000 2016
+```
+
+The new edge list only has the `#Spark` <-> `#Apache` edge removed. The edge `#Hadoop` <-> `#Apache` from the new tweet already exists in the edge list.
 
 ```
 #Apache <-> #Hadoop
@@ -256,17 +269,135 @@ Recalculating the average degree of all nodes in all graphs is as follows
 Average Degree = (1+2+1+2+2+2)/6 = 1.67
 ```
 
-Normally the average degree is calculated for a single graph, but maintaining multiple graphs for this problem can be quite difficult. For simplicity we are only interested in calculating the average degree of of all the nodes in all graphs despite them being disconnected.
+Normally the average degree is calculated for a single graph, but maintaining multiple graphs for this problem can be quite difficult. For simplicity, we are only interested in calculating the average degree of of all the nodes in all graphs despite them being disconnected.
 
-The rolling average degree since the 4th tweet is now 
+The rolling average degree now becomes
 
 ```
+1.00
+2.00
+2.00
 2.00
 2.00
 1.67
 ```
 
-The output should be a file in the `tweet_output` directory named `output.txt` that contains the rolling average for each tweet in the file (e.g. if there are three input tweets, then there should be 3 averages), following the format above.  The precision of the average should be two digits after the decimal place (i.e. rounded to the nearest hundredths place).
+## Dealing with tweets which arrive out of order in time
+
+Tweets which are out of order and fall within 60 sec window of the maximum timestamp processed will create new edges in the graph. However, tweets which are out of order in time and are outside the 60 sec window of the maximum timestamp processed, should be ignored and such tweets won't contribute to building the graph. Its easiest to understand with an example.
+
+Let's say that a new tweet comes in and the extracted information is
+
+```
+hashtags = [Flink, HBase], created_at: Thu Mar 24 17:52:10 +0000 2016
+```
+This tweet is out of order in time but falls within the 60 second time window of the maximum time processed (latest timestamp), i.e., *Thu Mar 24 17:52:12 +0000 2016*.
+
+The new hashtags to be used in constructing the graph are as follows
+
+```
+hashtags = [Apache, Hadoop, Storm], created_at: Thu Mar 24 17:51:15 +0000 2016
+hashtags = [Apache],                created_at: Thu Mar 24 17:51:30 +0000 2016
+hashtags = [Flink, Spark],          created_at: Thu Mar 24 17:51:55 +0000 2016
+hashtags = [Spark , HBase],         created_at: Thu Mar 24 17:51:58 +0000 2016
+hashtags = [Hadoop, Apache],        created_at: Thu Mar 24 17:52:12 +0000 2016
+hashtags = [Flink, HBase],          created_at: Thu Mar 24 17:52:10 +0000 2016
+```
+
+A new edge is added to the graph and the edge list becomes
+
+```
+#Apache <-> #Hadoop
+#Hadoop <-> #Storm
+#Storm <-> #Apache
+
+#Flink <-> #Spark
+
+#HBase <-> $Spark
+
+#HBase <-> #Flink
+``` 
+The graph can be visualized as
+
+![tweet-out-of-order](images/htag_graph_6.png)
+
+```
+The average degree is (2+2+2+2+2+2) / 6 = 2.00
+```
+
+The rolling average degree output becomes
+
+```
+1.00
+2.00
+2.00
+2.00
+2.00
+1.67
+2.00
+```
+
+Now, let's say that a new tweet comes in and the extracted information is
+
+```
+hashtags = [Cassandra, NoSQL], created_at: Thu Mar 24 17:51:10 +0000 2016
+```
+This tweet is out of order and is outside the 60 second window of the maximum timestamp processed (latest timestamp). This tweet should be ignored. It will not form new edges and will not contribute to the graph formation. The graph remains the same as before this tweet arrived.
+
+Consider that a new tweet arrives and the extracted information is
+
+```
+hashtags = [Kafka, Apache], created_at: Thu Mar 24 17:52:20 +0000 2016
+```
+
+We can see that the tweet with hashtags `[Apache, Hadoop, Storm]` has a timestamp that is more than 60 seconds behind this new tweet. This means that the edges formed by the tweet 60 seconds behind the maximum timestamp processed (latest timestamp) should be evicted and the edges formed by that should not be included in our average degree calculation.
+
+The new hashtags to be used in constructing the graph are as follows
+
+```
+hashtags = [Apache],                created_at: Thu Mar 24 17:51:30 +0000 2016
+hashtags = [Flink, Spark],          created_at: Thu Mar 24 17:51:55 +0000 2016
+hashtags = [Spark , HBase],         created_at: Thu Mar 24 17:51:58 +0000 2016
+hashtags = [Hadoop, Apache],        created_at: Thu Mar 24 17:52:12 +0000 2016
+hashtags = [Flink, HBase],          created_at: Thu Mar 24 17:52:10 +0000 2016
+hashtags = [Kafka, Apache],         created_at: Thu Mar 24 17:52:20 +0000 2016
+```
+
+The edge list now becomes
+
+```
+#Flink <-> #Spark
+
+#HBase <-> $Spark
+
+#Apache <-> #Hadoop
+
+#HBase <-> #Flink
+
+#Kafka <-> #Apache
+```
+The graph is as follows
+
+![new-tweet-in-order](images/htag_graph_7.png)
+
+```
+The average degree of the graph is (2+2+2+2+1+1) / 6 = 1.67
+```
+The rolling average degree output is
+
+```
+1.00
+2.00
+2.00
+2.00
+2.00
+1.67
+2.00
+1.67
+```
+
+The output should be a file in the `tweet_output` directory named `output.txt` that contains the rolling average for each tweet in the file **(e.g. if there are three input tweets, then there should be 3 averages)**, following the format above. The precision of the average should be two digits after the decimal place (i.e. rounded to the nearest hundredths place).
+
 
 ## Collecting tweets from the Twitter API
 Ideally, the updates of the average degree of a Twitter hashtag graph as each tweet arrives would be connected to the Twitter streaming API and would add new tweets to the end of `tweets.txt`.  However, connecting to the API requires more system specific "dev ops" work, which isn't the primary focus for data engineers.  Instead, you should simply assume that each new line of the text file corresponds to a new tweet and design your program to handle a text file with a large number of tweets.  Your program should output the results to a text file named `output.txt` in the `tweet_output` directory.
