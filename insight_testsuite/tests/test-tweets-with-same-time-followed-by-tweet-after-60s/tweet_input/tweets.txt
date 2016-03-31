@@ -1,0 +1,4 @@
+{"created_at":"Thu Mar 24 17:51:10 +0000 2016", "entities":{"hashtags":[{"text":"Spark","indices":[9,18]},{"text":"Apache","indices":[46,60]}]}}
+{"created_at":"Thu Mar 24 17:51:10 +0000 2016", "entities":{"hashtags":[{"text":"Apache","indices":[9,18]},{"text":"Hadoop","indices":[46,60]},{"text":"Storm","indices":[46,60]}]}}
+{"created_at":"Thu Mar 24 17:52:30 +0000 2016", "entities":{"hashtags":[{"text":"Apache","indices":[9,18]}]}}
+{"created_at":"Thu Mar 24 17:52:55 +0000 2016", "entities":{"hashtags":[{"text":"Flink","indices":[9,18]},{"text":"Spark","indices":[46,60]}]}}

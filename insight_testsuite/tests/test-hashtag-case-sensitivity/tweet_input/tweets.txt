@@ -1,0 +1,1 @@
+{"created_at":"Thu Mar 24 17:51:15 +0000 2016", "entities":{"hashtags":[{"text":"Spark","indices":[9,18]},{"text":"spark","indices":[46,60]},{"text":"SPARK","indices":[46,60]}]}}
